@@ -63,7 +63,8 @@ class DIP(PYBASE):
                 for i in range(n - len(grid)):
                     grid.append(np.zeros(grid[0].shape, dtype=np.uint8))
                 Grid = cv2.vconcat([Grid, cv2.hconcat(grid)])
-
+        
+        self.Grid = Grid
         return imshow(Grid) # TODO make it grid
 
 if __name__ == '__main__':
