@@ -1,4 +1,5 @@
 import cv2
+import multiprocessing as mp
 from .basic import load, save, imshow
 from KERNEL.PYTHON.classes.basic import PYBASE 
 
@@ -15,7 +16,7 @@ class CallBack(PYBASE):
 		self.__start()
 	
 	def __start(self):
-		self.state = None
+		self.state = mp.Manager().list() # proxy list can be accessed across multi proccess.
 	
 	def setMouseCallback(self, event, x, y, flags, params): 
 		for event_name in self.__class__.CallbackEvents['setMouseCallback']:
@@ -52,4 +53,4 @@ if __name__ == '__main__':
 			print('right click', kwargs['x'], kwargs['y'])
 	# TEST 0
 	imshow(load('*lena.jpg'), callback=CB()) # close image with press any key, while displayer is in focus.
-	imshow(load('*lena.jpg', 'gray'), callback=CB())
+	imshow(load('*lena.jpg', 'gray'), callback=CB()) # BUG: signal pause in imshow function.

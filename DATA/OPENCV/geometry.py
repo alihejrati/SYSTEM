@@ -10,7 +10,7 @@
 import cv2
 import numpy as np
 
-from DATA.OPENCV.basic import load, save
+from DATA.OPENCV.basic import load, save, imshow
 
 def affine(img, M, **kwargs):
     """M is affine_matrix."""
@@ -77,9 +77,14 @@ def flip(img, mode='both', **kwargs):
 
 def resize(img, **kwargs):
     H, W = img.shape[:2] # NOTE: name ordering is a rule!
-    h = int(kwargs.get('h', -1)) # OPTIONAL
-    w = int(kwargs.get('w', -1)) # OPTIONAL
+    h = int(kwargs.get('h', -1))   # OPTIONAL
+    w = int(kwargs.get('w', -1))   # OPTIONAL
+    s = float(kwargs.get('s', -1)) # OPTIONAL
     
+    if s != -1 and s != 1:
+        h = -1
+        w = int(W * s)
+
     aspect_ratio = True
     if w != -1 and h != -1:
         aspect_ratio = False
@@ -99,7 +104,8 @@ def resize(img, **kwargs):
 
 if __name__ == '__main__':
     # TEST 1) resize
-    # got_img = load('./import/got.png')
+    imshow(resize(load('*lena.jpg'), s=1.2))
+    
     # got_img_h128w256 = resize(got_img, w=256, h=128)
     # got_img_h256w128 = resize(got_img, w=128, h=256)
     # got_img_w400 = resize(got_img, w=400)

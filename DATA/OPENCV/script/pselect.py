@@ -1,42 +1,84 @@
-import cv2
 from ...IO import fs
 from ..callback import CallBack 
-from ...PANDAS.basic import create
 from ..basic import load, save, imshow
+from ...PANDAS.basic import \
+    save as dfsave, \
+    create as dfcreate
 
-class CB(CallBack):
+class PSelect(CallBack):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.__start()
 
     def __start(self):
-        self.n = 0
-        self.N = int(self.kwargs.get('N', 1))
-        self.fname = str(self.kwargs.get('fname'))
-        self.state = []
+        flag = bool(self.kwargs.get('flag', False))
+        if flag: # slave call
+            self.n = 0
+            self.N = int(self.kwargs.get('N'))
+        else: # master call
+            self.run()
+
+    def run(self):
+        """
+            N: number of points
+            P: name of each point # OPTIONAL
+            F: name of each feature # OPTIONAL
+        """
+        head = int(self.kwargs.get('head', -1))
+        srcdir = str(self.kwargs.get('srcdir'))
+        N = int(self.kwargs.get('N', 1))
+        P = list(self.kwargs.get('P', [f'P{i+1}' for i in range(N)]))
+        dfpath = str(self.kwargs.get('dfpath', '*opencv_script_pselect.csv'))
+        
+        assert len(P) == N
+
+        data = []
+        
+        for idxf, fpath in enumerate(fs.ls(srcdir)):
+            img = load(fpath)
+            state = imshow(img, callback=self.__class__(N=N, flag=True))
+            fname = fs.ospsplit(fpath)[1]
+            dfrow = dict()
+            for idxp, p in enumerate(state):
+                F = list(self.kwargs.get('F', range(len(p)))) # OPTIONAL
+                assert len(F) == len(p)
+                for idxpi, pi in enumerate(p):
+                    dfrow[f'{P[idxp]}_{F[idxpi]}'] = pi
+            
+            dip = self.kwargs.get('dip', None)
+            if dip is not None:
+                dip_obj = dip(img, points=dfrow, points_name=P, points_feature_name=F)
+                dfrow = dict(**dip_obj.kwargs.get('points', dict()))
+
+            dfrow = dict(ID=fname, **dfrow)
+
+            data.append(dfrow)
+            
+            if idxf == head - 1:
+                break
+        
+        print(dfcreate(data))
+        dfsave(dfpath, dfcreate(data))
 
     def CB_EVENT_LBUTTONDOWN(self, **kwargs):
+        """
+            # NOTE: you can overwrite this function for new inherited PSelect class, i.e. for extracting other features than x,y.
+        """
         if self.n < self.N:
             self.n += 1
-            self.state.append([kwargs['x'], kwargs['y']])
-            print(self.fname, kwargs['x'], kwargs['y'])
+            self.state.append([kwargs['x'], kwargs['y']]) # NOTE: overwritable candidate.
 
         if self.n >= self.N:
-            print('######', self.state)
             self.winclose()
-
-def pselect(srcdir, N):
-    for fpath in fs.ls(srcdir):
-        cb = CB(
-            N=N,
-            fname=fs.ospsplit(fpath)[1]
-        )
-        state = imshow(load(fpath), callback=cb)
-        print(state)
-        print(cb.state)
-
+    
 if __name__ == '__main__':
-    pselect(
-        '/home/alihejrati/Documents/Dataset/fundus - RetinaLessions/retinal-lesions-v20191227/images_896x896/*.jpg',
-        N=2
+    from .processing.sharpening import Basic
+    PSelect(
+        head=3,
+        srcdir='/home/alihejrati/Documents/Dataset/fundus - RetinaLessions/retinal-lesions-v20191227/images_896x896/*.jpg',
+        dfpath='*/RetinaLessions.csv',
+        dip=Basic,
+        N=2,
+        F=['X', 'Y'],
+        P=['OD', 'FOV'],
     )

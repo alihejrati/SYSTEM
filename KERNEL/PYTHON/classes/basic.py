@@ -7,6 +7,7 @@ from types import MethodType, FunctionType
 
 class PYBASE:
     """
+        # NOTE: if you wanna define params for this function all of those shoude be named as `PYB_varname`.
         becareful in naming variable and function becuse this class can be inherit in multi class inheritence 
         starategy as left as possible and will be overwite all other right classes.
     """
@@ -27,11 +28,11 @@ class PYBASE:
     def __start(self):
         pass
     
-    def def_ifn(self, name: str, fn, **kwargs):
-        """
-            define instance function in specefic or all object(s).
-            fn is must be define outside of any classes and it must be has `self` param as first in its parammeters.
-        """
-        # setattr(self.__class__, name, fn) # define in all instances
-        Self = kwargs.get('Self', self) # OPTIONAL
-        setattr(Self, name, MethodType(fn, Self)) # define in one instance
+    # def def_ifn(self, name: str, fn, **kwargs):
+    #     """
+    #         define instance function in specefic or all object(s).
+    #         fn is must be define outside of any classes and it must be has `self` param as first in its parammeters.
+    #     """
+    #     # setattr(self.__class__, name, fn) # define in all instances
+    #     Self = kwargs.get('Self', self) # OPTIONAL
+    #     setattr(Self, name, MethodType(fn, Self)) # define in one instance
