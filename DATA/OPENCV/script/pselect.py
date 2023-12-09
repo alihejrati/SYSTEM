@@ -47,8 +47,8 @@ class PSelect(CallBack):
             
             dip = self.kwargs.get('dip', None)
             if dip is not None:
-                dip_obj = dip(img, points=dfrow, points_name=P, points_feature_name=F)
-                dfrow = dict(**dip_obj.kwargs.get('points', dict()))
+                dip_obj = dip(img, DIP_POINTS=dfrow, DIP_POINTS_NAME=P, DIP_POINTS_FEATURE_NAME=F)
+                dfrow = dict(**dip_obj.kwargs.get('DIP_POINTS', dict()))
 
             dfrow = dict(ID=fname, **dfrow)
 
@@ -57,7 +57,6 @@ class PSelect(CallBack):
             if idxf == head - 1:
                 break
         
-        print(dfcreate(data))
         dfsave(dfpath, dfcreate(data))
 
     def CB_EVENT_LBUTTONDOWN(self, **kwargs):
@@ -66,7 +65,7 @@ class PSelect(CallBack):
         """
         if self.n < self.N:
             self.n += 1
-            self.state.append([kwargs['x'], kwargs['y']]) # NOTE: overwritable candidate.
+            self.state.append([kwargs['x'], kwargs['y']]) # NOTE: overwritable candidate => feature extraction
 
         if self.n >= self.N:
             self.winclose()

@@ -13,9 +13,9 @@ class DIP(PYBASE):
     def __start(self):
         """
             self.kwargs # OPTIONAL
-                -> points: dict of points like => {'OD_X': 457, 'OD_Y': 400, 'FOV_X': 457, 'FOV_Y': 497}
-                -> points_name: list of point names like => ['OD', 'FOV'] 
-                -> points_feature_name: list of point feature names like => ['X', 'Y']
+                -> DIP_POINTS: dict of points like => {'OD_X': 457, 'OD_Y': 400, 'FOV_X': 457, 'FOV_Y': 497}
+                -> DIP_POINTS_NAME: list of point names like => ['OD', 'FOV'] 
+                -> DIP_POINTS_FEATURE_NAME: list of point feature names like => ['X', 'Y']
         """
         if isinstance(self.x, str):
             self.x = load(self.x)

@@ -6,7 +6,6 @@ from ...basic import load, save, imshow
 class Basic(DIP):
     def processing(self):
         img = self.x
-        print(self.kwargs)
         kernel_sharpening = np.array([
             [-1,    -1,     -1], 
             [-1,     9,     -1], 
