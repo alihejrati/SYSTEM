@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+from ..IO import fs
 from .geometry import resize
 from .basic import load, save, imshow
 from KERNEL.PYTHON.classes.basic import PYBASE
@@ -13,6 +14,10 @@ class DIP(PYBASE):
     def __start(self):
         """
             self.kwargs # OPTIONAL
+                -> DIP_VIEW: contains view params for run it automatically,
+                -> DIP_FNAME: src/dst file name
+                -> DIP_DPATH: dst directory path
+                -> DIP_FPATH: dst file path
                 -> DIP_POINTS: dict of points like => {'OD_X': 457, 'OD_Y': 400, 'FOV_X': 457, 'FOV_Y': 497}
                 -> DIP_POINTS_NAME: list of point names like => ['OD', 'FOV'] 
                 -> DIP_POINTS_FEATURE_NAME: list of point feature names like => ['X', 'Y']
@@ -23,13 +28,17 @@ class DIP(PYBASE):
         if self.kwargs.get('run_processing_flag', True): # OPTIONAL
             self.y = self.processing()
         
+        if self.kwargs.get('DIP_VIEW', None):
+            query = self.kwargs['DIP_VIEW']['query']
+            self.view(*query, **self.kwargs['DIP_VIEW'])
+
     def processing(self):
         return self.x
 
     def diff(self):
         return cv2.subtract(self.x, self.y)
     
-    def view(self, *query, n=-1, s=1):
+    def view(self, *query, n=-1, s=1, **kwargs):
         if len(query) == 0:
             query = ['x', 'y']
         
@@ -65,13 +74,19 @@ class DIP(PYBASE):
                 Grid = cv2.vconcat([Grid, cv2.hconcat(grid)])
         
         self.Grid = Grid
-        return imshow(Grid) # TODO make it grid
+        if kwargs.get('save_flag', False): # OPTIONAL
+            save(self.kwargs.get('DIP_FPATH', fs.ospjoin(
+                self.kwargs.get('DIP_DPATH', '*/DIP'),
+                self.kwargs.get('DIP_FNAME', 'example.png')
+            )), self.Grid)
+        if kwargs.get('imshow_flag', True): # OPTIONAL
+            return imshow(Grid)
 
 if __name__ == '__main__':
     # TEST 0
     DIP('*lena.jpg').view('x', 'diff()', 'y', s=.5, n=3)
     DIP('*lena.jpg').view('x', 'x', 'x', 'x', 'y', s=.5) # n <- int(sqrt(5))
     DIP('*lena.jpg').view('x', 'x', 'x', 'x', 'y', s=.5, n=9)
-    DIP('*lena.jpg').view('x', 'x', 'x', 'x', 'y', s=.5, n=3)
+    DIP('*lena.jpg').view('x', 'x', 'x', 'x', 'y', s=.5, n=3, save_flag=True)
     DIP('*lena.jpg').view('x', 'x', 'x', 'x', 'y', s=.5, n=4)
     DIP('*lena.jpg').view('x', 'x', 'x', 'x', 'y', s=.3, n=1)

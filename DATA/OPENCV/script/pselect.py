@@ -24,11 +24,11 @@ class PSelect(CallBack):
             P: name of each point # OPTIONAL
             F: name of each feature # OPTIONAL
         """
-        head = int(self.kwargs.get('head', -1))
-        srcdir = str(self.kwargs.get('srcdir'))
-        N = int(self.kwargs.get('N', 1))
-        P = list(self.kwargs.get('P', [f'P{i+1}' for i in range(N)]))
-        dfpath = str(self.kwargs.get('dfpath', '*opencv_script_pselect.csv'))
+        srcdir = str(self.kwargs['srcdir'])
+        head = int(self.kwargs.get('head', -1)) # OPTIONAL
+        N = int(self.kwargs.get('N', 1)) # OPTIONAL
+        P = list(self.kwargs.get('P', [f'P{i+1}' for i in range(N)])) # OPTIONAL
+        dfpath = str(self.kwargs.get('dfpath', '*opencv_script_pselect.csv')) # OPTIONAL
         
         assert len(P) == N
 
@@ -45,9 +45,16 @@ class PSelect(CallBack):
                 for idxpi, pi in enumerate(p):
                     dfrow[f'{P[idxp]}_{F[idxpi]}'] = pi
             
-            dip = self.kwargs.get('dip', None)
+            dip = self.kwargs.get('dip', None) # OPTIONAL
             if dip is not None:
-                dip_obj = dip(img, DIP_POINTS=dfrow, DIP_POINTS_NAME=P, DIP_POINTS_FEATURE_NAME=F)
+                dip_obj = dip(
+                    img,
+                    DIP_FNAME=fname,
+                    DIP_POINTS=dfrow, 
+                    DIP_POINTS_NAME=P, 
+                    DIP_POINTS_FEATURE_NAME=F,
+                    **self.kwargs.get('dip_params', dict()) # OPTIONAL
+                )
                 dfrow = dict(**dip_obj.kwargs.get('DIP_POINTS', dict()))
 
             dfrow = dict(ID=fname, **dfrow)
@@ -74,10 +81,14 @@ if __name__ == '__main__':
     from .processing.sharpening import Basic
     PSelect(
         head=3,
-        srcdir='/home/alihejrati/Documents/Dataset/fundus - RetinaLessions/retinal-lesions-v20191227/images_896x896/*.jpg',
-        dfpath='*/RetinaLessions.csv',
-        dip=Basic,
         N=2,
         F=['X', 'Y'],
         P=['OD', 'FOV'],
+        srcdir='/home/alihejrati/Documents/Dataset/fundus - RetinaLessions/retinal-lesions-v20191227/images_896x896/*.jpg',
+        dfpath='*/RetinaLessions.csv',
+        dip=Basic,
+        dip_params=dict(
+            DIP_DPATH='*/RetinaLessions',
+            DIP_VIEW=dict(query=['y'], n=3, imshow_flag=False, save_flag=True)
+        )
     )

@@ -53,7 +53,7 @@ except Exception as e:
 
 def save(fpath: str, img):
     if fpath.startswith('*'): # NOTE: index path
-        fpath = fs.path('@opencv', 'export', fpath[1:])
+        fpath = fs.path('@opencv', 'export', fpath[1:], makedirs=True)
     else:
         fpath = fs.path(fpath, f_back=1, makedirs=True)
 

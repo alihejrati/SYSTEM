@@ -16,7 +16,7 @@ def create(data, **kwargs):
 
 def save(fpath: str, df, **kwargs):
     if fpath.startswith('*'): # NOTE: index path
-        fpath = fs.path('@pandas', 'export', fpath[1:])
+        fpath = fs.path('@pandas', 'export', fpath[1:], makedirs=True)
     else:
         fpath = fs.path(fpath, f_back=1, makedirs=True)
 
