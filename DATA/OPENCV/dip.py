@@ -121,7 +121,9 @@ class DIP(PYBASE):
             return imshow(Grid, callback=kwargs.get('callback', None))
 
 if __name__ == '__main__':
-    # TEST 0
+    # BUG: there is no bug, but if you run test0 and test1 togetere there is a little bug, you can check it later.
+
+    # TEST 0) testcase example
     # DIP('*lena.jpg').view('x', 'diff()', 'y', s=.5, n=3)
     # DIP('*lena.jpg').view('x', 'x', 'x', 'x', 'y', s=.5) # n <- int(sqrt(5))
     # DIP('*lena.jpg').view('x', 'x', 'x', 'x', 'y', s=.5, n=9)
@@ -129,13 +131,15 @@ if __name__ == '__main__':
     # DIP('*lena.jpg').view('x', 'x', 'x', 'x', 'y', s=.5, n=4)
     # DIP('*lena.jpg').view('x', 'x', 'x', 'x', 'y', s=.3, n=1)
 
-    # TEST 1
+    # TEST 1) dataloader example
     from .callback.pselect import PSelect
-    DIP(
+    from .processing.sharpening import Basic
+    Basic(
         DIP_SPATH='/home/alihejrati/Documents/Dataset/fundus - RetinaLessions/retinal-lesions-v20191227/images_896x896/*.jpg',
         DIP_SPATH_HEAD=3,
         DIP_DPATH='*/RetinaLessions',
-        # DIP_VIEW=dict(query=['y'], n=3, imshow_flag=True, save_flag=True),
+        DIP_DF_DPATH='*/RetinaLessions.csv',
+        DIP_VIEW=dict(query=['x', 'diff()', 'y'], s=.5, n=3, imshow_flag=False, save_flag=True),
         DIP_CALLBACK=PSelect,
         DIP_CALLBACK_ARGS=dict(N=2, F=['X', 'Y'], P=['OD', 'FOV'])
     )
