@@ -133,8 +133,7 @@ if __name__ == '__main__':
 
     # TEST 1) dataloader example
     from .callback.pselect import PSelect
-    from .processing.sharpening import Basic
-    Basic(
+    DIP(
         DIP_SPATH='/home/alihejrati/Documents/Dataset/fundus - RetinaLessions/retinal-lesions-v20191227/images_896x896/*.jpg',
         DIP_SPATH_HEAD=3,
         DIP_DPATH='*/RetinaLessions',
