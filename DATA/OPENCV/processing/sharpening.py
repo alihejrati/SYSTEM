@@ -21,7 +21,6 @@ if __name__ == '__main__':
     imshow(basic_sharpener.y)
 
     # TEST 1) dataloader example
-    from ..callback.pselect import PSelect
     Basic(
         DIP_SPATH='/home/alihejrati/Documents/Dataset/fundus - RetinaLessions/retinal-lesions-v20191227/images_896x896/*.jpg',
         DIP_SPATH_HEAD=3,
