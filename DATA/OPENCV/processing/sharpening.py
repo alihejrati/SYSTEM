@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 from ..dip import DIP
-from ..basic import load, save, imshow
+from ..basic import imshow
 
 class Basic(DIP):
     def processing(self):
