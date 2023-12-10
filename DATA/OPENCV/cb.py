@@ -34,10 +34,14 @@ class CallBack(PYBASE):
 	def winclose(self):
 		assert self.winname != None and self.handler != None
 		cv2.destroyWindow(self.winname)
-		self.handler()
 		self.winname = None
+		self.handler()
 		self.handler = None
 
+	def dip_state_handler(self, state): # NOTE: overwite this function in each child class.
+		dip_state_dict = dict() # NOTE: compute this dictionary givven `state` input and variable names in `DIP subclass`. 
+		return dip_state_dict
+	
 	def CB_EVENT_LBUTTONDOWN(self, **kwargs):
 		pass
 	

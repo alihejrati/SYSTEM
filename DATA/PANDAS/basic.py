@@ -29,6 +29,9 @@ def save(fpath: str, df, **kwargs):
     
 
 def load(fpath: str, **kwargs):
+    """
+    # TODO: empty file handler
+    """
     if fpath.startswith('*'): # NOTE: index path
         fpath = fs.path('@pandas', 'import', fpath[1:])
     else:

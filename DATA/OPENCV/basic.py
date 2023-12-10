@@ -96,7 +96,7 @@ def convert_color(img, mode='bgr2rgb'):
 def imshow(img, mode='cv2', **kwargs):
     if mode == 'cv2':
         callback = kwargs.get('callback', None)
-        winname = str(kwargs.get('winname', 'image'))
+        winname = str(kwargs.get('winname', None) or 'image')
         if callback:
             h = Handler()
             def handler():
