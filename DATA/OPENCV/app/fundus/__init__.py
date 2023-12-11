@@ -1,0 +1,1 @@
+ROOT_DIR = '@opencv/app/fundus'

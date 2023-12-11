@@ -1,7 +1,8 @@
 import cv2
 import numpy as np
 from ..IO import fs
-from .geometry import resize
+from .geometry import Geometry
+from .mathematics import Mathematics
 from .basic import load, save, imshow
 from KERNEL.PYTHON.classes.basic import PYBASE
 from ..PANDAS.basic import create as dfcreate, save as dfsave
@@ -26,8 +27,10 @@ class DIP(PYBASE):
                 -> DIP_CALLBACK: default values is None, it gonna be set on img from testcase img handler. # NOTE: self.view() has its own callback param from its kwargs variable, and it ganna be set on Grid image, if imshow operation was active.
                 -> DIP_CALLBACK_ARGS: args passed to DIP_CALLBACK if DIP_CALLBACK was exist.
                 -> DIP_DF_DPATH: `dst` path for saving data likes: ID,DIP_POINTS,... as dataframe # NOTE: dataloader handler
+                -> DIP_DF_SPATH: # TODO
         """
         DIP_SPATH = self.kwargs.get('DIP_SPATH', False) # OPTIONAL: use it only for make dataloader handler not for testcase img handler.
+        DIP_DF_SPATH = self.kwargs.get('DIP_DF_SPATH', False) # TODO!!!!!!!!!!!!
         DIP_SPATH_HEAD = int(self.kwargs.get('DIP_SPATH_HEAD', -1)) # OPTIONAL: use it only for make dataloader handler not for testcase img handler.
         if DIP_SPATH: # NOTE: dataloader handler.
             data = []
@@ -35,7 +38,11 @@ class DIP(PYBASE):
                 fname = fs.ospsplit(fpath)[1]
                 self.kwargs['DIP_FNAME'] = fname
                 self.kwargs['DIP_SPATH'] = False
+                self.kwargs['DIP_DF_SPATH'] = False
                 self.kwargs['DIP_SPATH_HEAD'] = -1
+                self.kwargs['_DIP_SPATH'] = DIP_SPATH
+                self.kwargs['_DIP_DF_SPATH'] = DIP_DF_SPATH
+                self.kwargs['_DIP_SPATH_HEAD'] = DIP_SPATH_HEAD
                 dip_obj = self.__class__(fpath, **self.kwargs)
                 data.append(dict(
                     ID=fname, 
@@ -50,7 +57,12 @@ class DIP(PYBASE):
             return
 
         
+
+        
         # NOTE: testcase img handler.
+        self.geometry = Geometry()
+        self.mathematics = Mathematics()
+
         if isinstance(self.x, str):
             self.x = load(self.x)
         
@@ -65,6 +77,10 @@ class DIP(PYBASE):
 
         if self.kwargs.get('run_processing_flag', True): # OPTIONAL
             self.y = self.processing()
+            if self.y is None:
+                pass
+            else:
+                self.y = self.y.astype(np.uint8)
         
         if self.kwargs.get('DIP_VIEW', None):
             query = self.kwargs['DIP_VIEW']['query']
@@ -92,7 +108,7 @@ class DIP(PYBASE):
                 image = getattr(self, q)
 
             if s != 1: # OPTIONAL
-                image = resize(image, s=s)
+                image = self.geometry.resize(image, s=s)
 
             grid.append(image)
 
@@ -113,10 +129,10 @@ class DIP(PYBASE):
         
         self.Grid = Grid
         if kwargs.get('save_flag', False): # OPTIONAL
-            save(self.kwargs.get('DIP_FPATH', fs.ospjoin(
+            save(kwargs.get('fpath', self.kwargs.get('DIP_FPATH', fs.ospjoin(
                 self.kwargs.get('DIP_DPATH', '*/DIP'),
                 self.kwargs.get('DIP_FNAME', 'example.png')
-            )), self.Grid)
+            ))), self.Grid)
         if kwargs.get('imshow_flag', True): # OPTIONAL
             return imshow(Grid, callback=kwargs.get('callback', None))
 
