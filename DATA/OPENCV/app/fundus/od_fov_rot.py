@@ -16,32 +16,30 @@ class FundusROT(DIP):
         print('--->', FOV_X, FOV_Y, OD_X, OD_Y)
         for i in range(len(df)):
             row = df.iloc[i]
-            refimg = load(fs.ospjoin(dpath, row['ID']))
+            Qimg = load(fs.ospjoin(dpath, row['ID']))
             fov_x, fov_y, od_x, od_y = row['FOV_X'], row['FOV_Y'], row['OD_X'], row['OD_Y']
             print(fov_x, fov_y, od_x, od_y)
             left = row['ID'].split('.')[0].split('_')[1].lower() == 'left'
             
             if LEFT != left: # filp horizental
-                refimg = self.geometry.flip(refimg, 'h')
-                width = refimg.shape[1]
+                Qimg = self.geometry.flip(Qimg, 'h')
+                width = Qimg.shape[1]
                 od_x = width - od_x - 1
                 fov_x = width - fov_x - 1
 
 
-            cv2.line(refimg, (od_x, od_y), (fov_x, fov_y), (0, 255, 0), thickness=2)
-            cv2.line(refimg, (od_x, od_y), (FOV_X, FOV_Y), (255, 0, 0), thickness=2)
-            cv2.line(refimg, (fov_x, fov_y), (FOV_X, FOV_Y), (0, 0, 255), thickness=2)
+            cv2.line(Qimg, (od_x, od_y), (fov_x, fov_y), (0, 255, 0), thickness=2)
+            cv2.line(Qimg, (od_x, od_y), (FOV_X, FOV_Y), (255, 0, 0), thickness=2)
+            cv2.line(Qimg, (fov_x, fov_y), (FOV_X, FOV_Y), (0, 0, 255), thickness=2)
             
-            # self.tmp = self.geometry.ROT(refimg, theta=0, tx=OD_X-od_x, ty=OD_Y-od_y)
-            self.tmp1 = refimg
+            # self.tmp = self.geometry.ROT(Qimg, theta=0, tx=OD_X-od_x, ty=OD_Y-od_y)
+            self.tmp1 = Qimg
             self.view('x', 'tmp1', n=2, imshow_flag=False, save_flag=True, fpath=fs.ospjoin(
                 self.kwargs['DIP_DPATH'],
                 self.kwargs['DIP_FNAME'].split('.')[0],
                 row['ID']
             ))
-        # input()
-        return 
-        
+
 
 if __name__ == '__main__':
     from . import ROOT_DIR

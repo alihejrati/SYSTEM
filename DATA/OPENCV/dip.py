@@ -16,6 +16,7 @@ class DIP(PYBASE):
     def __start(self):
         """
             self.kwargs # OPTIONAL
+                -> DIP_RUN: bool value for controling of executable proccessing function.
                 -> DIP_VIEW: contains view params for run it automatically,
                 -> DIP_FPATH: dst file path => save view
                 -> DIP_FNAME: src/dst file name => save  view
@@ -75,19 +76,25 @@ class DIP(PYBASE):
             for cbs_k, cbs_v in dip_cb_state_handler.items():
                 self.kwargs['DIP_POINTS'][cbs_k] = cbs_v
 
-        if self.kwargs.get('run_processing_flag', True): # OPTIONAL
+        if self.kwargs.get('DIP_RUN', True): # OPTIONAL
+            self.x = self.preprocessing()
             self.y = self.processing()
-            if self.y is None:
-                pass
-            else:
+            self.y = self.postprocessing()
+            if self.y is not None:
                 self.y = self.y.astype(np.uint8)
         
         if self.kwargs.get('DIP_VIEW', None):
             query = self.kwargs['DIP_VIEW']['query']
             self.view(*query, **self.kwargs['DIP_VIEW'])
 
+    def preprocessing(self):
+        return self.x
+    
     def processing(self):
         return self.x
+
+    def postprocessing(self):
+        return self.y
 
     def diff(self):
         return cv2.subtract(self.x, self.y)
