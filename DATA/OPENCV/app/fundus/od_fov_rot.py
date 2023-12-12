@@ -28,13 +28,13 @@ class FundusROT(DIP):
                 fov_x = width - fov_x - 1
 
 
-            cv2.line(Qimg, (od_x, od_y), (fov_x, fov_y), (0, 255, 0), thickness=2)
-            cv2.line(Qimg, (od_x, od_y), (FOV_X, FOV_Y), (255, 0, 0), thickness=2)
-            cv2.line(Qimg, (fov_x, fov_y), (FOV_X, FOV_Y), (0, 0, 255), thickness=2)
+            self.draw.line(Qimg, (od_x, od_y), (fov_x, fov_y), color=(0, 255, 0))
+            self.draw.line(Qimg, (od_x, od_y), (FOV_X, FOV_Y), color=(255, 0, 0))
+            self.draw.line(Qimg, (fov_x, fov_y), (FOV_X, FOV_Y), color=(0, 0, 255))
             
             # self.tmp = self.geometry.ROT(Qimg, theta=0, tx=OD_X-od_x, ty=OD_Y-od_y)
             self.tmp1 = Qimg
-            self.view('x', 'tmp1', n=2, imshow_flag=False, save_flag=True, fpath=fs.ospjoin(
+            self.view('x', 'tmp1', n=2, imshow=False, save=True, fpath=fs.ospjoin(
                 self.kwargs['DIP_DPATH'],
                 self.kwargs['DIP_FNAME'].split('.')[0],
                 row['ID']
@@ -48,5 +48,5 @@ if __name__ == '__main__':
         DIP_SPATH_HEAD=3,
         DIP_DF_SPATH=f'{ROOT_DIR}/export/RetinaLessions.csv',
         DIP_DPATH=f'{ROOT_DIR}/export/RetinaLessions',
-        # DIP_VIEW=dict(query=['x', 'y'], n=3, imshow_flag=False, save_flag=True),
+        # DIP_VIEW=dict(query=['x', 'y'], n=3, imshow=False, save=True),
     )

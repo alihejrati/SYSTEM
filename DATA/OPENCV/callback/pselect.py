@@ -26,6 +26,7 @@ class PSelect(CallBack):
         """
         if self.n < self.N:
             self.n += 1
+            self.winupdate(center=[kwargs['x'], kwargs['y']])
             self.state.append([kwargs['x'], kwargs['y']]) # NOTE: overwritable candidate => feature extraction
 
         if self.n >= self.N:

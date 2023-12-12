@@ -48,7 +48,7 @@ except Exception as e:
     def cv2_imshow(img, winname, callback=None, handler=None):
         cv2.imshow(winname, img)
         if callback:
-            callback.sethook(winname, handler)
+            callback.sethook(winname, handler, img)
         cv2.waitKey(0)
 
 def save(fpath: str, img):

@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 from ..IO import fs
+from .draw import Draw
 from .geometry import Geometry
 from .mathematics import Mathematics
 from .basic import load, save, imshow
@@ -61,6 +62,7 @@ class DIP(PYBASE):
 
         
         # NOTE: testcase img handler.
+        self.draw = Draw()
         self.geometry = Geometry()
         self.mathematics = Mathematics()
 
@@ -135,12 +137,12 @@ class DIP(PYBASE):
                 Grid = cv2.vconcat([Grid, cv2.hconcat(grid)])
         
         self.Grid = Grid
-        if kwargs.get('save_flag', False): # OPTIONAL
+        if kwargs.get('save', False): # OPTIONAL
             save(kwargs.get('fpath', self.kwargs.get('DIP_FPATH', fs.ospjoin(
                 self.kwargs.get('DIP_DPATH', '*/DIP'),
                 self.kwargs.get('DIP_FNAME', 'example.png')
             ))), self.Grid)
-        if kwargs.get('imshow_flag', True): # OPTIONAL
+        if kwargs.get('imshow', True): # OPTIONAL
             return imshow(Grid, callback=kwargs.get('callback', None))
 
 if __name__ == '__main__':
@@ -150,7 +152,7 @@ if __name__ == '__main__':
     # DIP('*lena.jpg').view('x', 'diff()', 'y', s=.5, n=3)
     # DIP('*lena.jpg').view('x', 'x', 'x', 'x', 'y', s=.5) # n <- int(sqrt(5))
     # DIP('*lena.jpg').view('x', 'x', 'x', 'x', 'y', s=.5, n=9)
-    # DIP('*lena.jpg').view('x', 'x', 'x', 'x', 'y', s=.5, n=3, save_flag=True)
+    # DIP('*lena.jpg').view('x', 'x', 'x', 'x', 'y', s=.5, n=3, save=True)
     # DIP('*lena.jpg').view('x', 'x', 'x', 'x', 'y', s=.5, n=4)
     # DIP('*lena.jpg').view('x', 'x', 'x', 'x', 'y', s=.3, n=1)
 
@@ -161,7 +163,7 @@ if __name__ == '__main__':
         DIP_SPATH_HEAD=3,
         DIP_DPATH='*/RetinaLessions',
         DIP_DF_DPATH='*/RetinaLessions.csv',
-        DIP_VIEW=dict(query=['x', 'diff()', 'y'], s=.5, n=3, imshow_flag=False, save_flag=True),
+        DIP_VIEW=dict(query=['x', 'diff()', 'y'], s=.5, n=3, imshow=False, save=True),
         DIP_CALLBACK=PSelect,
         DIP_CALLBACK_ARGS=dict(N=2, F=['X', 'Y'], P=['OD', 'FOV'])
     )

@@ -25,5 +25,5 @@ if __name__ == '__main__':
         DIP_SPATH='/home/alihejrati/Documents/Dataset/fundus - RetinaLessions/retinal-lesions-v20191227/images_896x896/*.jpg',
         DIP_SPATH_HEAD=3,
         DIP_DPATH='*/RetinaLessions',
-        DIP_VIEW=dict(query=['x', 'diff()', 'y'], s=.5, n=3, imshow_flag=False, save_flag=True),
+        DIP_VIEW=dict(query=['x', 'diff()', 'y'], s=.5, n=3, imshow=False, save=True),
     )
