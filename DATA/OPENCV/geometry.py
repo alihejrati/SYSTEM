@@ -31,7 +31,7 @@ class Geometry(PYBASE):
         h, w = img.shape[:2]
         return cv2.warpAffine(img, np.float32(M), (w, h))
 
-    def translation(self, img, tx, ty, **kwargs):
+    def translation(self, img, tx=0, ty=0, **kwargs):
         """
             Example: tx=100, ty=-50
             Negative values of tx will shift the image to the left
@@ -47,7 +47,7 @@ class Geometry(PYBASE):
             return M
         return self.affine(img, M)
 
-    def rotation(self, img, theta, s=1, **kwargs):
+    def rotation(self, img, theta=0, **kwargs):
         """
             Example: theta=60, s=1
             if theta is positive, our output image will rotate counterclockwise(<-). Similarly, 
@@ -56,8 +56,11 @@ class Geometry(PYBASE):
             * s = 2 -> rotated image will have the doubled in size.
         """
         h, w = img.shape[:2]
-        center = (w // 2, h // 2)
-        M = cv2.getRotationMatrix2D(kwargs.get('era_center', center), theta, float(s))
+        scale = float(kwargs.get('scale', 1)) # OPTIONAL
+        center = list(kwargs.get('center', (w // 2, h // 2)))
+        center[0] = int(center[0])
+        center[1] = int(center[1])
+        M = cv2.getRotationMatrix2D(center, theta, scale)
         if kwargs.get('return_M', False): # OPTIONAL
             return M
         return self.affine(img, M)
@@ -66,7 +69,7 @@ class Geometry(PYBASE):
         """
             params: theta, tx, ty
         """
-        R = self.rotation(img, **kwargs, return_M=True)
+        R = self.rotation(img, **kwargs, return_M=True) # its also done scale transform with `scale` param as well.
         T = self.translation(img, **kwargs, return_M=True)
         T[:, :-1] = 0
         M = R + T

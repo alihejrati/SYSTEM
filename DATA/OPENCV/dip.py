@@ -3,8 +3,8 @@ import numpy as np
 from ..IO import fs
 from .draw import Draw
 from .geometry import Geometry
-from .mathematics import Mathematics
 from .basic import load, save, imshow
+from ..NUMPY.mathematics import Mathematics
 from KERNEL.PYTHON.classes.basic import PYBASE
 from ..PANDAS.basic import create as dfcreate, save as dfsave
 
