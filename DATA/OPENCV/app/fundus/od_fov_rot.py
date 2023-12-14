@@ -50,7 +50,6 @@ class FundusROT(DIP):
         IMG_NAME = self.kwargs['DIP_FNAME'].replace('.jpg', '')
         FOV_X, FOV_Y, OD_X, OD_Y = ROW['FOV_X'], ROW['FOV_Y'], ROW['OD_X'], ROW['OD_Y']
         LEFT = FOV_X < OD_X
-        print('###############', LEFT, FOV_X, OD_X)
         for i in range(len(df)):
             self.X = self.x.copy()
             row = df.iloc[i]
@@ -62,7 +61,6 @@ class FundusROT(DIP):
             self.uppath_clahe = fs.ospjoin(self.kwargs['DIP_DPATH'], IMG_NAME, row['ID'].replace('.jpg', '') + '_clahe')
             fov_x, fov_y, od_x, od_y = row['FOV_X'], row['FOV_Y'], row['OD_X'], row['OD_Y']
             left = fov_x < od_x
-            print('-------------->', left)
             self.Q = q.copy() # Orginal
             self.X = q.copy()
 
@@ -74,7 +72,6 @@ class FundusROT(DIP):
             self.cunvexhull()
 
             if LEFT != left: # filp horizental
-                print('@@@@@@@@@@@@@@@@@@')
                 q = self.geometry.flip(q, 'h')
                 for puckkey in self.puckets:
                     self.puckets[puckkey] = self.geometry.flip(self.puckets[puckkey], 'h')
