@@ -2,29 +2,82 @@ import cv2
 import numpy as np
 from ....IO import fs
 from ...dip import DIP
-from ...basic import imshow, load
+import albumentations as A
+from ...basic import imshow, load, save
 from ....PANDAS.basic import load as dfload
 
+Tclahe = A.Compose([
+    A.CLAHE(clip_limit=4.0, tile_grid_size=(8, 8), always_apply=True, p=1),
+])
+
 class FundusROT(DIP):
+    def lmask(self):
+        pure_leasion = np.zeros(self.X.shape)
+        qpd, qpf = fs.ospsplit(self.qpath)
+        lpaths = fs.ls(fs.ospjoin(qpd, '..', 'lesion_segs_896x896', qpf.replace('.jpg', ''), '*'))
+        for lpath in lpaths:
+            lesion = load(lpath)
+            pure_leasion = pure_leasion + (lesion > 0).astype(np.float32)
+        pure_leasion = (np.clip(pure_leasion, 0, 1) * 255).astype(np.uint8)
+        self._lmask = pure_leasion
+        self.puckets[fs.ospjoin(self.uppath_normal, 'lmask.jpg')] = self._lmask
+        self.puckets[fs.ospjoin(self.uppath_clahe, 'lmask.jpg')] = self._lmask
+
+    def lesion(self):
+        self.puckets[fs.ospjoin(self.uppath_normal, 'lesion.jpg')] = (self.X - .8 * (1 - (self._lmask / 255)) * self.X).astype(np.uint8)
+        self.puckets[fs.ospjoin(self.uppath_clahe, 'lesion.jpg')] = (self.Xclahe - .8 * (1 - (self._lmask / 255)) * self.Xclahe).astype(np.uint8)
+
+    def fundus_mask(self):
+        fmask = self.morphology.convex_hull(self.X[:,:,1])
+        self.puckets[fs.ospjoin(self.uppath_normal, 'fmask.jpg')] = fmask
+        self.puckets[fs.ospjoin(self.uppath_clahe, 'fmask.jpg')] = fmask
+    
+    def fundus(self):
+        self.Xclahe = Tclahe(image=self.X)['image']
+        self.puckets[fs.ospjoin(self.uppath_normal, 'fundus.jpg')] = self.X.copy()
+        self.puckets[fs.ospjoin(self.uppath_clahe, 'fundus.jpg')] = self.Xclahe
+
+    def cunvexhull(self):
+        cvh = self.morphology.convex_hull(self._lmask[:,:,0])
+        self.puckets[fs.ospjoin(self.uppath_normal, 'cvh.jpg')] = cvh
+        self.puckets[fs.ospjoin(self.uppath_clahe, 'cvh.jpg')] = cvh
+
+
     def processing(self):
         df = dfload(self.kwargs['_DIP_DF_SPATH'])
         dpath = fs.ospsplit(self.kwargs['_DIP_SPATH'])[0]
         ROW = df[df['ID'] == self.kwargs['DIP_FNAME']].iloc[0]
-        # LEFT = self.kwargs['DIP_FNAME'].split('.')[0].split('_')[1].lower() == 'left'
+        IMG_NAME = self.kwargs['DIP_FNAME'].replace('.jpg', '')
         FOV_X, FOV_Y, OD_X, OD_Y = ROW['FOV_X'], ROW['FOV_Y'], ROW['OD_X'], ROW['OD_Y']
         LEFT = FOV_X < OD_X
+        print('###############', LEFT, FOV_X, OD_X)
         for i in range(len(df)):
             self.X = self.x.copy()
             row = df.iloc[i]
             if row['ID'] == self.kwargs['DIP_FNAME']:
                 continue
-            q = load(fs.ospjoin(dpath, row['ID']))
+            self.qpath = fs.ospjoin(dpath, row['ID'])
+            q = load(self.qpath)
+            self.uppath_normal = fs.ospjoin(self.kwargs['DIP_DPATH'], IMG_NAME, row['ID'].replace('.jpg', ''))
+            self.uppath_clahe = fs.ospjoin(self.kwargs['DIP_DPATH'], IMG_NAME, row['ID'].replace('.jpg', '') + '_clahe')
             fov_x, fov_y, od_x, od_y = row['FOV_X'], row['FOV_Y'], row['OD_X'], row['OD_Y']
-            # left = row['ID'].split('.')[0].split('_')[1].lower() == 'left'
             left = fov_x < od_x
+            print('-------------->', left)
             self.Q = q.copy() # Orginal
+            self.X = q.copy()
+
+            self.puckets = dict()
+            self.fundus()
+            self.lmask()
+            self.lesion()
+            self.fundus_mask()
+            self.cunvexhull()
+
             if LEFT != left: # filp horizental
+                print('@@@@@@@@@@@@@@@@@@')
                 q = self.geometry.flip(q, 'h')
+                for puckkey in self.puckets:
+                    self.puckets[puckkey] = self.geometry.flip(self.puckets[puckkey], 'h')
                 width = q.shape[1]
                 od_x = width - od_x - 1
                 fov_x = width - fov_x - 1
@@ -48,52 +101,29 @@ class FundusROT(DIP):
             alpha = np.sign(FOV_Y-fov_y) * self.mathematics.triangle([OD_X, OD_Y], [FOV_X, FOV_Y], [fov_x+OD_X-od_x, fov_y+OD_Y-od_y])['angle']['alpha']
             if LEFT == False:
                 alpha = -1 * alpha
+            
+            for puckkey in self.puckets:
+                self.puckets[puckkey] = self.geometry.ROT(self.puckets[puckkey], tx=tx_err+OD_X-od_x, ty=OD_Y-od_y)
+                self.puckets[puckkey] = self.geometry.ROT(self.puckets[puckkey], theta=alpha, center=[OD_X, OD_Y])
             self.qrot = self.geometry.ROT(self.qrot, tx=tx_err+OD_X-od_x, ty=OD_Y-od_y)
+            
+            self.qrot_after_translate = self.qrot.copy()
+            self.draw.circle(self.qrot_after_translate, [OD_X, OD_Y], color='#e01b1b')
+            self.draw.circle(self.qrot_after_translate, [FOV_X, FOV_Y], color='#1b70e0')
+            self.draw.line(self.qrot_after_translate, [OD_X, OD_Y], [FOV_X, FOV_Y], color='#34a1eb')
+            self.draw.line(self.qrot_after_translate, [OD_X, OD_Y], [fov_x+OD_X-od_x, fov_y+OD_Y-od_y], color='#ebe534')
+            self.draw.line(self.qrot_after_translate, [FOV_X, FOV_Y], [fov_x+OD_X-od_x, fov_y+OD_Y-od_y], color='#030303')
+
             self.qrot = self.geometry.ROT(self.qrot, theta=alpha, center=[OD_X, OD_Y])
             self.draw.circle(self.qrot, [OD_X, OD_Y], color='#e01b1b')
             self.draw.circle(self.qrot, [FOV_X, FOV_Y], color='#1b70e0')
-            # self.xq = self.x / 255 * 
-            self.view('X', 'q', 'Q', 
-                    'qrot', n=3, imshow=False, save=True, fpath=fs.ospjoin(
-                self.kwargs['DIP_DPATH'],
-                self.kwargs['DIP_FNAME'].split('.')[0],
-                row['ID']
-            ))
-
-
-
-
-
-
-
-
-
-
-
-            # Qimg0 = Qimg.copy()
-
-            # self.draw.line(Qimg, (od_x, od_y), (fov_x, fov_y), color=(0, 255, 0))
-            # self.draw.line(Qimg, (od_x, od_y), (FOV_X, FOV_Y), color=(255, 0, 0))
-            # self.draw.line(Qimg, (fov_x, fov_y), (FOV_X, FOV_Y), color=(0, 0, 255))
-            
-            # triangle = self.mathematics.triangle((od_x, od_y), (fov_x, fov_y), (FOV_X, FOV_Y))
-            # alpha = triangle['angle']['alpha']
-            # alpha = np.sign(fov_y - FOV_Y) * alpha
-            # # if LEFT:
-            # #     alpha = -1 * alpha
-            # print(self.kwargs['DIP_FNAME'], row['ID'], alpha)
-
-            # self.tmp = self.geometry.ROT(Qimg0, theta=alpha, tx=od_x-OD_X, ty=od_y-OD_Y)
-            # self.tmp1 = Qimg
-            # self.tmp2 = ((Qimg0.copy() / 255 * 0 + self.tmp.copy() / 255 * 1 + img / 255 * 0) * 255).astype(np.uint8)
-            # self.draw.circle(self.tmp2, (fov_x, fov_y), 20, color=(0,0,0))
-            # self.draw.circle(self.tmp2, (FOV_X, FOV_Y), 20)
-
-            # self.draw.line(self.tmp2, (OD_X, OD_Y), (fov_x, fov_y), color=(0, 255, 0))
-            # self.draw.line(self.tmp2, (OD_X, OD_Y), (FOV_X, FOV_Y), color=(255, 0, 0))
-            # self.draw.line(self.tmp2, (fov_x, fov_y), (FOV_X, FOV_Y), color=(0, 0, 255))
 
             
+            for puckkey, puckval in self.puckets.items():
+                save(puckkey, puckval)
+            
+            self.view('x', 'q', 'Q', 
+                    'qrot_after_translate', 'qrot', n=3, imshow=False, save=True, fpath=fs.ospjoin(self.uppath_normal, 'example.jpg'))
 
 if __name__ == '__main__':
     from . import ROOT_DIR

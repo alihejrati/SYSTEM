@@ -3,6 +3,7 @@ import numpy as np
 from ..IO import fs
 from .draw import Draw
 from .geometry import Geometry
+from .morphology import Morphology
 from .basic import load, save, imshow
 from ..NUMPY.mathematics import Mathematics
 from KERNEL.PYTHON.classes.basic import PYBASE
@@ -64,7 +65,11 @@ class DIP(PYBASE):
         # NOTE: testcase img handler.
         self.draw = Draw()
         self.geometry = Geometry()
+        self.morphology = Morphology()
         self.mathematics = Mathematics()
+
+        self.p = float(self.kwargs.get('p', 1)) # probibility
+        # self.xn = 0 # default senario is working with single image stored at self.x
 
         if isinstance(self.x, str):
             self.x = load(self.x)
@@ -105,7 +110,7 @@ class DIP(PYBASE):
         if len(query) == 0:
             query = ['x', 'y']
         
-        n = int((len(query) ** .5) if n == -1 else n) # number of image in each row in grid view.
+        n = int((len(query) ** .5) if n == -1 else n) # number of images in each row in grid view.
         assert n>=1
 
         grid = []
