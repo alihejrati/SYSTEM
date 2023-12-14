@@ -5,6 +5,7 @@ from ...dip import DIP
 import albumentations as A
 from ...basic import imshow, load, save
 from ....PANDAS.basic import load as dfload
+from tqdm import tqdm
 
 Tclahe = A.Compose([
     A.CLAHE(clip_limit=4.0, tile_grid_size=(8, 8), always_apply=True, p=1),
@@ -38,6 +39,7 @@ class FundusROT(DIP):
         self.puckets[fs.ospjoin(self.uppath_clahe, 'fundus.jpg')] = self.Xclahe
 
     def cunvexhull(self):
+        return
         cvh = self.morphology.convex_hull(self._lmask[:,:,0])
         self.puckets[fs.ospjoin(self.uppath_normal, 'cvh.jpg')] = cvh
         self.puckets[fs.ospjoin(self.uppath_clahe, 'cvh.jpg')] = cvh
@@ -50,7 +52,7 @@ class FundusROT(DIP):
         IMG_NAME = self.kwargs['DIP_FNAME'].replace('.jpg', '')
         FOV_X, FOV_Y, OD_X, OD_Y = ROW['FOV_X'], ROW['FOV_Y'], ROW['OD_X'], ROW['OD_Y']
         LEFT = FOV_X < OD_X
-        for i in range(len(df)):
+        for i in tqdm(range(len(df))):
             self.X = self.x.copy()
             row = df.iloc[i]
             if row['ID'] == self.kwargs['DIP_FNAME']:
@@ -119,8 +121,8 @@ class FundusROT(DIP):
             for puckkey, puckval in self.puckets.items():
                 save(puckkey, puckval)
             
-            self.view('x', 'q', 'Q', 
-                    'qrot_after_translate', 'qrot', n=3, imshow=False, save=True, fpath=fs.ospjoin(self.uppath_normal, 'example.jpg'))
+            # self.view('x', 'q', 'Q', 
+            #         'qrot_after_translate', 'qrot', n=3, imshow=False, save=True, fpath=fs.ospjoin(self.uppath_normal, 'example.jpg'))
 
 if __name__ == '__main__':
     from . import ROOT_DIR

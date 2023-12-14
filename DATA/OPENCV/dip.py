@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 from ..IO import fs
+from tqdm import tqdm
 from .draw import Draw
 from .geometry import Geometry
 from .morphology import Morphology
@@ -8,6 +9,7 @@ from .basic import load, save, imshow
 from ..NUMPY.mathematics import Mathematics
 from KERNEL.PYTHON.classes.basic import PYBASE
 from ..PANDAS.basic import create as dfcreate, save as dfsave
+
 
 class DIP(PYBASE):
     def __init__(self, x=None, **kwargs):
@@ -37,7 +39,7 @@ class DIP(PYBASE):
         DIP_SPATH_HEAD = int(self.kwargs.get('DIP_SPATH_HEAD', -1)) # OPTIONAL: use it only for make dataloader handler not for testcase img handler.
         if DIP_SPATH: # NOTE: dataloader handler.
             data = []
-            for idx_fpath, fpath in enumerate(fs.ls(DIP_SPATH)):
+            for idx_fpath, fpath in enumerate(tqdm(fs.ls(DIP_SPATH))):
                 fname = fs.ospsplit(fpath)[1]
                 self.kwargs['DIP_FNAME'] = fname
                 self.kwargs['DIP_SPATH'] = False
