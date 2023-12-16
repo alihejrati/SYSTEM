@@ -95,7 +95,7 @@ class DSP(PYBASE):
     def type_cast(self):
         return self.y
 
-    def view(self, *query, n=-1, s=1, **kwargs):
+    def view(self, *query, n=-1, s=1, **kwargs): # TODO
         if len(query) == 0:
             query = ['x', 'y']
         
