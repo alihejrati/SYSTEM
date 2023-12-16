@@ -39,28 +39,46 @@ class FundusROT(DIP):
         self.puckets[fs.ospjoin(self.uppath_clahe, 'fundus.jpg')] = self.Xclahe
 
     def cunvexhull(self):
-        return
         cvh = self.morphology.convex_hull(self._lmask[:,:,0])
         self.puckets[fs.ospjoin(self.uppath_normal, 'cvh.jpg')] = cvh
         self.puckets[fs.ospjoin(self.uppath_clahe, 'cvh.jpg')] = cvh
 
 
     def processing(self):
-        df = dfload(self.kwargs['_DIP_DF_SPATH'])
-        dpath = fs.ospsplit(self.kwargs['_DIP_SPATH'])[0]
-        ROW = df[df['ID'] == self.kwargs['DIP_FNAME']].iloc[0]
-        IMG_NAME = self.kwargs['DIP_FNAME'].replace('.jpg', '')
+        df_fum_candidateimgs = self.kwargs['df_fum_candidateimgs']
+        df = dfload(self.kwargs['_DF_SPATH'])
+        dpath = fs.ospsplit(self.kwargs['_SPATH'])[0]
+        ROW = df[df['ID'] == self.kwargs['FNAME']].iloc[0]
+        IMG_NAME = self.kwargs['FNAME'].replace('.jpg', '')
         FOV_X, FOV_Y, OD_X, OD_Y = ROW['FOV_X'], ROW['FOV_Y'], ROW['OD_X'], ROW['OD_Y']
         LEFT = FOV_X < OD_X
-        for i in tqdm(range(len(df))):
+        
+        Qrow = df_fum_candidateimgs[df_fum_candidateimgs['src'] == self.kwargs['FNAME']]
+        
+        if len(Qrow) == 0:
+            return
+        Qrow = Qrow.iloc[0]
+        
+        clsindicator = {
+            '0': ['2', '[34]'],
+            '1': ['2', '[34]'],
+            '2': ['[01]', '[34]'],
+            '3': ['[01]', '2'],
+            '4': ['[01]', '2'],
+        }
+        clsindicator = clsindicator[str(Qrow.loc['src_cls'])]
+
+        # for i in tqdm(range(len(df))):
+        for i in clsindicator: # read query images in loop
             self.X = self.x.copy()
-            row = df.iloc[i]
-            if row['ID'] == self.kwargs['DIP_FNAME']:
-                continue
-            self.qpath = fs.ospjoin(dpath, row['ID'])
+            row = df[df['ID'] == Qrow.loc[i].replace('_clahe', '')].iloc[0] # row corespond to query image
+            row_ID = row['ID']
+            # if row_ID == self.kwargs['FNAME']:
+            #     row_ID = row_ID.replace('.jpg', '_clahe.jpg') # TODO
+            self.qpath = fs.ospjoin(dpath, row_ID)
             q = load(self.qpath)
-            self.uppath_normal = fs.ospjoin(self.kwargs['DIP_DPATH'], IMG_NAME, row['ID'].replace('.jpg', ''))
-            self.uppath_clahe = fs.ospjoin(self.kwargs['DIP_DPATH'], IMG_NAME, row['ID'].replace('.jpg', '') + '_clahe')
+            self.uppath_normal = fs.ospjoin(self.kwargs['DPATH'], IMG_NAME, row_ID.replace('.jpg', ''))
+            self.uppath_clahe = fs.ospjoin(self.kwargs['DPATH'], IMG_NAME, row_ID.replace('.jpg', '') + '_clahe')
             fov_x, fov_y, od_x, od_y = row['FOV_X'], row['FOV_Y'], row['OD_X'], row['OD_Y']
             left = fov_x < od_x
             self.Q = q.copy() # Orginal
@@ -127,10 +145,11 @@ class FundusROT(DIP):
 if __name__ == '__main__':
     from . import ROOT_DIR
     FundusROT(
-        DIP_SPATH='/home/alihejrati/Documents/Dataset/fundus - RetinaLessions/retinal-lesions-v20191227/images_896x896/*.jpg',
-        # DIP_SPATH='/content/retinal-lesions-v20191227/images_896x896/*.jpg',
-        DIP_SPATH_HEAD=30,
-        DIP_DF_SPATH=f'{ROOT_DIR}/export/RetinaLessions.csv',
-        DIP_DPATH=f'{ROOT_DIR}/export/RetinaLessions',
-        # DIP_VIEW=dict(query=['x', 'y'], n=3, imshow=False, save=True),
+        SPATH='/home/alihejrati/Documents/Dataset/fundus - RetinaLessions/retinal-lesions-v20191227/images_896x896/*.jpg',
+        # SPATH='/content/retinal-lesions-v20191227/images_896x896/*.jpg',
+        # SPATH_HEAD=30,
+        DF_SPATH=f'{ROOT_DIR}/export/RetinaLessions.csv',
+        DPATH=f'{ROOT_DIR}/export/RetinaLessions',
+        # VIEW=dict(query=['x', 'y'], n=3, imshow=False, save=True),
+        df_fum_candidateimgs = dfload(f'{ROOT_DIR}/import/df_fum_candidateimgs.csv')
     )

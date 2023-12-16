@@ -36,10 +36,10 @@ if __name__ == '__main__':
     # TEST 0
     from ..processing.sharpening import Basic as BasicSharpener
     basicsharpener = BasicSharpener(
-        DIP_SPATH='/home/alihejrati/Documents/Dataset/fundus - RetinaLessions/retinal-lesions-v20191227/images_896x896/*.jpg',
-        DIP_SPATH_HEAD=3,
-        DIP_DF_DPATH='*/RetinaLessions.csv',
-        DIP_CALLBACK=PSelect,
-        DIP_CALLBACK_ARGS=dict(N=2, F=['X', 'Y'], P=['OD', 'FOV'])
+        SPATH='/home/alihejrati/Documents/Dataset/fundus - RetinaLessions/retinal-lesions-v20191227/images_896x896/*.jpg',
+        SPATH_HEAD=3,
+        DF_DPATH='*/RetinaLessions.csv',
+        CALLBACK=PSelect,
+        CALLBACK_ARGS=dict(N=2, F=['X', 'Y'], P=['OD', 'FOV'])
     )
     print(basicsharpener.df)

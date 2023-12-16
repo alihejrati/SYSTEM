@@ -59,8 +59,9 @@ def save(fpath: str, img):
 
     return cv2.imwrite(fpath, img)
 
-def load(fpath: str, mode='color'):
+def load(fpath: str, mode=None):
     """Loading our image with a cv2.imread() function, this function loads the image in BGR order"""
+    mode = str('color' if mode is None else mode)
     if mode == 'color':
         mode = cv2.IMREAD_COLOR # There’s also another option for loading a color image: we can just put the number 1 instead cv2.IMREAD_COLOR and we will obtain the same output.
     elif mode == 'gray':
