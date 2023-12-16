@@ -22,26 +22,26 @@ class FundusROT(DIP):
         pure_leasion = (np.clip(pure_leasion, 0, 1) * 255).astype(np.uint8)
         self._lmask = pure_leasion
         self.puckets[fs.ospjoin(self.uppath_normal, 'lmask.jpg')] = self._lmask
-        self.puckets[fs.ospjoin(self.uppath_clahe, 'lmask.jpg')] = self._lmask
+        # self.puckets[fs.ospjoin(self.uppath_clahe, 'lmask.jpg')] = self._lmask
 
     def lesion(self):
         self.puckets[fs.ospjoin(self.uppath_normal, 'lesion.jpg')] = (self.X - .8 * (1 - (self._lmask / 255)) * self.X).astype(np.uint8)
-        self.puckets[fs.ospjoin(self.uppath_clahe, 'lesion.jpg')] = (self.Xclahe - .8 * (1 - (self._lmask / 255)) * self.Xclahe).astype(np.uint8)
+        # self.puckets[fs.ospjoin(self.uppath_clahe, 'lesion.jpg')] = (self.Xclahe - .8 * (1 - (self._lmask / 255)) * self.Xclahe).astype(np.uint8)
 
     def fundus_mask(self):
         fmask = self.morphology.convex_hull(self.X[:,:,1])
         self.puckets[fs.ospjoin(self.uppath_normal, 'fmask.jpg')] = fmask
-        self.puckets[fs.ospjoin(self.uppath_clahe, 'fmask.jpg')] = fmask
+        # self.puckets[fs.ospjoin(self.uppath_clahe, 'fmask.jpg')] = fmask
     
     def fundus(self):
-        self.Xclahe = Tclahe(image=self.X)['image']
+        # self.Xclahe = Tclahe(image=self.X)['image']
         self.puckets[fs.ospjoin(self.uppath_normal, 'fundus.jpg')] = self.X.copy()
-        self.puckets[fs.ospjoin(self.uppath_clahe, 'fundus.jpg')] = self.Xclahe
+        # self.puckets[fs.ospjoin(self.uppath_clahe, 'fundus.jpg')] = self.Xclahe
 
     def cunvexhull(self):
         cvh = self.morphology.convex_hull(self._lmask[:,:,0])
         self.puckets[fs.ospjoin(self.uppath_normal, 'cvh.jpg')] = cvh
-        self.puckets[fs.ospjoin(self.uppath_clahe, 'cvh.jpg')] = cvh
+        # self.puckets[fs.ospjoin(self.uppath_clahe, 'cvh.jpg')] = cvh
 
 
     def processing(self):
@@ -77,7 +77,8 @@ class FundusROT(DIP):
             #     row_ID = row_ID.replace('.jpg', '_clahe.jpg') # TODO
             self.qpath = fs.ospjoin(dpath, row_ID)
             q = load(self.qpath)
-            self.uppath_normal = fs.ospjoin(self.kwargs['DPATH'], IMG_NAME, row_ID.replace('.jpg', ''))
+            # self.uppath_normal = fs.ospjoin(self.kwargs['DPATH'], IMG_NAME, row_ID.replace('.jpg', ''))
+            self.uppath_normal = fs.ospjoin(self.kwargs['DPATH'], IMG_NAME, i)
             self.uppath_clahe = fs.ospjoin(self.kwargs['DPATH'], IMG_NAME, row_ID.replace('.jpg', '') + '_clahe')
             fov_x, fov_y, od_x, od_y = row['FOV_X'], row['FOV_Y'], row['OD_X'], row['OD_Y']
             left = fov_x < od_x
@@ -137,17 +138,17 @@ class FundusROT(DIP):
 
             
             for puckkey, puckval in self.puckets.items():
-                save(puckkey, puckval)
+                save(puckkey, self.geometry.resize(puckval, w=256, h=256))
             
-            # self.view('x', 'q', 'Q', 
-            #         'qrot_after_translate', 'qrot', n=3, imshow=False, save=True, fpath=fs.ospjoin(self.uppath_normal, 'example.jpg'))
+            
+            self.view('x', 'q', 'Q', 
+                    'qrot_after_translate', 'qrot', n=3, imshow=False, save=True, fpath=fs.ospjoin(self.uppath_normal, 'example.jpg'))
 
 if __name__ == '__main__':
     from . import ROOT_DIR
     FundusROT(
         SPATH='/home/alihejrati/Documents/Dataset/fundus - RetinaLessions/retinal-lesions-v20191227/images_896x896/*.jpg',
-        # SPATH='/content/retinal-lesions-v20191227/images_896x896/*.jpg',
-        # SPATH_HEAD=30,
+        SPATH_HEAD=10,
         DF_SPATH=f'{ROOT_DIR}/export/RetinaLessions.csv',
         DPATH=f'{ROOT_DIR}/export/RetinaLessions',
         # VIEW=dict(query=['x', 'y'], n=3, imshow=False, save=True),
