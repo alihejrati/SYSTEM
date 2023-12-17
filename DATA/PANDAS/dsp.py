@@ -71,7 +71,8 @@ class DSP(PYBASE):
         elif self.Nx == 1:
             self.x = self.x0
         else:
-            self.x = None
+            # self.x = None
+            pass
         
         self.signal()
 
