@@ -60,14 +60,15 @@ class DSP(PYBASE):
         self.mathematics = Mathematics()
 
         self.p = float(self.kwargs.get('p', 1)) # PROBABILITY
-
+        
+        self.Nx = len(self.x)
         for idx, xi in enumerate(self.x):
             if isinstance(xi, str):
                 self.x[idx] = self.loader(xi)
             setattr(self, f'x{idx}', self.x[idx])
-        if len(self.x) == 0:
+        if self.Nx == 0:
             self.x = None
-        elif len(self.x) == 1:
+        elif self.Nx == 1:
             self.x = self.x0
         else:
             self.x = None
