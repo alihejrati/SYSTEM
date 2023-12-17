@@ -8,9 +8,9 @@ from KERNEL.PYTHON.classes.basic import PYBASE
 class DSP(PYBASE):
     """Digital Signal Processing"""
     
-    def __init__(self, x=None, **kwargs):
+    def __init__(self, *x, **kwargs):
         super().__init__(**kwargs)
-        self.x = x
+        self.x = list(x)
         self.__start()
 
     def __start(self):
@@ -61,8 +61,16 @@ class DSP(PYBASE):
 
         self.p = float(self.kwargs.get('p', 1)) # PROBABILITY
 
-        if isinstance(self.x, str):
-            self.x = self.loader(self.x)
+        for idx, xi in enumerate(self.x):
+            if isinstance(xi, str):
+                self.x[idx] = self.loader(xi)
+            setattr(self, f'x{idx}', self.x[idx])
+        if len(self.x) == 0:
+            self.x = None
+        elif len(self.x) == 1:
+            self.x = self.x0
+        else:
+            self.x = None
         
         self.signal()
 

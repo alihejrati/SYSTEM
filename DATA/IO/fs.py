@@ -2,6 +2,7 @@ import os, sys
 from glob import glob
 from os.path import \
     join as ospjoin, \
+    isdir as ospisdir, \
     split as ospsplit, \
     dirname as ospdirname,\
     abspath as ospabspath
@@ -9,9 +10,13 @@ from os.path import \
 __MARK_FILE = '.mark'
 __LOCAL_DIR = ospsplit(__file__)[0]
 __ROOT_DIR = ospjoin(__LOCAL_DIR, '..', '..')
-__STRUCTURE = dict(
-    ('@' + j, ospjoin(__ROOT_DIR, i, j)) for i in os.listdir(__ROOT_DIR) for j in os.listdir(ospjoin(__ROOT_DIR, i)) if i.isupper() and j.isupper()
-)
+__STRUCTURE = dict()
+
+for i in os.listdir(__ROOT_DIR):
+    if ospisdir(i):
+        for j in os.listdir(ospjoin(__ROOT_DIR, i)):
+            if i.isupper() and j.isupper():
+                __STRUCTURE['@' + j] = ospjoin(__ROOT_DIR, i, j)
 
 def ls(*src):
     src = os.sep.join(src)
