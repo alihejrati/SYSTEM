@@ -43,7 +43,6 @@ class FundusROT(DIP):
         self.puckets[fs.ospjoin(self.uppath_normal, 'cvh.jpg')] = cvh
         # self.puckets[fs.ospjoin(self.uppath_clahe, 'cvh.jpg')] = cvh
 
-
     def processing(self):
         df_fum_candidateimgs = self.kwargs['df_fum_candidateimgs']
         df = dfload(self.kwargs['_DF_SPATH'])
