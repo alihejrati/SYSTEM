@@ -3,7 +3,7 @@ from tqdm import tqdm
 from .basic import create, load, save
 from ..NUMPY.mathematics import Mathematics
 from ..NUMPY.basic import load as npload
-from KERNEL.PYTHON.classes.basic import PYBASE
+from KERNEL.SCRIPT.python.classes.basic import PYBASE
 
 class DSP(PYBASE):
     """Digital Signal Processing"""

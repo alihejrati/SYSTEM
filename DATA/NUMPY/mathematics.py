@@ -1,5 +1,5 @@
 import numpy as np
-from KERNEL.PYTHON.classes.basic import PYBASE
+from KERNEL.SCRIPT.python.classes.basic import PYBASE
 
 class Mathematics(PYBASE):
     def __init__(self, **kwargs):

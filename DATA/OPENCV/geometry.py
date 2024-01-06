@@ -9,7 +9,7 @@
 
 import cv2
 import numpy as np
-from KERNEL.PYTHON.classes.basic import PYBASE
+from KERNEL.SCRIPT.python.classes.basic import PYBASE
 from DATA.OPENCV.basic import load, save, imshow
 
 

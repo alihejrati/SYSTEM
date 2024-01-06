@@ -1,6 +1,6 @@
 import numpy as np
 from .basic import load, imshow
-from KERNEL.PYTHON.classes.basic import PYBASE
+from KERNEL.SCRIPT.python.classes.basic import PYBASE
 from skimage.morphology import convex_hull_image
 
 class Morphology(PYBASE):

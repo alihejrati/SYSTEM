@@ -2,7 +2,7 @@
 
 import torch
 from torch.nn import functional as F
-from KERNEL.PYTHON.classes.basic import PYBASE
+from KERNEL.SCRIPT.python.classes.basic import PYBASE
 
 class Patcher(PYBASE):
     """

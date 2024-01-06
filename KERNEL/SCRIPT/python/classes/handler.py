@@ -1,7 +1,7 @@
 import os
 import signal as sig
 from signal import signal
-from .basic import PYBASE
+from KERNEL.SCRIPT.python.classes.basic import PYBASE
 
 class Handler(PYBASE):
     def __init__(self, **kwargs):

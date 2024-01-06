@@ -1,6 +1,6 @@
 import torch
 from torch import nn
-from KERNEL.PYTHON.classes.basic import PYBASE
+from KERNEL.SCRIPT.python.classes.basic import PYBASE
 
 class Lerner(PYBASE, nn.Module):
     def __init__(self, **kwargs):

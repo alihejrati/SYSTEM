@@ -1,6 +1,6 @@
 import cv2
 from .basic import load, save, imshow
-from KERNEL.PYTHON.classes.basic import PYBASE
+from KERNEL.SCRIPT.python.classes.basic import PYBASE
 
 class Draw(PYBASE):
     def __init__(self, **kwargs):

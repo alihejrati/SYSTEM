@@ -38,8 +38,8 @@ from time import sleep
 from threading import Thread
 import matplotlib.pyplot as plt
 from multiprocessing import Process
-from KERNEL.PYTHON.classes.handler import Handler
-from KERNEL.PYTHON.functions.coding import random_string
+from KERNEL.SCRIPT.python.classes.handler import Handler
+from KERNEL.SCRIPT.python.functions.coding import random_string
 
 try:
     # For Google Colab we use the cv2_imshow() function

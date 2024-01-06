@@ -1,7 +1,7 @@
 import cv2
 import multiprocessing as mp
 from .basic import load, save, imshow
-from KERNEL.PYTHON.classes.basic import PYBASE 
+from KERNEL.SCRIPT.python.classes.basic import PYBASE 
 
 class CallBack(PYBASE):
 	CallbackEvents = dict(

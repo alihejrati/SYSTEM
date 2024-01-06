@@ -1,7 +1,7 @@
 # TODO
 
 import iniherit
-from .basic import PYBASE
+from KERNEL.SCRIPT.python.classes.basic import PYBASE
 
 class ConfigParser(PYBASE):
     config = dict() # share across all instances.
