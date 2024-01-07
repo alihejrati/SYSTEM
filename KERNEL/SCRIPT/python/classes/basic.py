@@ -7,7 +7,7 @@ from types import MethodType, FunctionType
 
 class PYBASE:
     """
-        # NOTE: if you wanna define params for this function all of those shoude be named as `PYB_varname`.
+        # NOTE: if you wanna define params for this function all of those shoude be named as `PYB_VARNAME`.
         becareful in naming variable and function becuse this class can be inherit in multi class inheritence 
         starategy as left as possible and will be overwite all other right classes.
     """

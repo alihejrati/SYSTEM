@@ -1,3 +1,5 @@
+# NOTE: working with disk(s)
+
 import os, sys
 from glob import glob
 from os.path import \
