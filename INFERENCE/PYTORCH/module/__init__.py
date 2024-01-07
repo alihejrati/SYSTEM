@@ -1,3 +1,4 @@
+from .. import Grad
 from KERNEL.SCRIPT.python.classes.basic import PYBASE
 
 class Module(PYBASE):
@@ -6,4 +7,4 @@ class Module(PYBASE):
         self.__start()
 
     def __start(self):
-        pass
+        self.Grad = Grad

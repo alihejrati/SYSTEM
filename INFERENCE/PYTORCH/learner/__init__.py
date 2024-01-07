@@ -1,4 +1,5 @@
 import torch
+from .. import Grad
 from torch import nn
 from KERNEL.SCRIPT.python.classes.basic import PYBASE
 
@@ -8,4 +9,4 @@ class Lerner(PYBASE, nn.Module):
         self.__start()
 
     def __start(self):
-        pass
+        self.Grad = Grad()
