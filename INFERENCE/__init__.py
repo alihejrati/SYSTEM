@@ -1,31 +1,34 @@
-from KERNEL.SCRIPT.python.classes.basic import PYBASE
+import re
+from KERNEL.SCRIPT.python.classes.memory import Memory
 from KERNEL.SCRIPT.python.interface.database.sqlite import SQLite
 
-class Metrics(PYBASE):
+class Points(Memory):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.__start()
 
     def __start(self):
-        self.metrics = dict()
+        self.points = self.memory
+    
+    def save(self):
+        pass
+
+class Metrics(Memory):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.__start()
+
+    def __start(self):
+        self.R = dict()
         self.reductions = dict()
+        self.metrics = self.memory
 
     def logger(self, tag: str, **kwargs):
-        """this shoud be overwrite in each Logger class"""
-        print(self.reductions[tag])
-
-    def log(self, tag: str, logdict, **kwargs):
-        """assuming that each `mv` is a scaller value!! if you dont this mind you can freely change this function such that compatability also exist:)"""
-        for mk, mv in logdict.items():
-            try:
-                self.metrics[tag][mk].append(mv)
-            except Exception as e:
-                self.metrics[tag] = self.metrics.get(tag, dict())
-                self.metrics[tag][mk] = self.metrics[tag].get(mk, [])
-                self.metrics[tag][mk].append(mv)
-
+        """this function shoud be overwrite in each child class"""
+        print(self.reductions)
+    
     def save(self, tag: str, **kwargs):
-        for MK, mv in self.metrics.get(tag, dict()).items():
+        for MK, mv in self.memory.get(tag, dict()).items():
             mk, mr = (MK + ':reduction_mean').split(':')[:2]
             mrv = getattr(self, mr)(tag, mk, mv)
             if mrv is None:
@@ -38,8 +41,22 @@ class Metrics(PYBASE):
         
         self.logger(tag, **kwargs)
 
-        self.metrics[tag] = dict()
+        self.R[tag] = self.reductions[tag]
+        self.memory[tag] = dict()
         self.reductions[tag] = dict()
+
+        return self.R[tag]
+
+    def inference(self, tag: str, regexp: str, **kwargs):
+        R = kwargs.get('R', self.R[tag]) # OPTIONAL
+        reduction = kwargs.get('reduction', 'reduction_mean') # OPTIONAL
+
+        RV = []
+        pattern = re.compile(regexp)
+        for rk, rv in R.items():
+            if pattern.match(rk):
+                RV.append(rv)
+        return getattr(self, reduction)(tag, None, RV)
 
     def reduction_sum(self, tag: str, mk: str, mv):
         return sum(mv)
@@ -53,10 +70,10 @@ class Metrics(PYBASE):
     def reduction_accuracy(self, tag: str, mk: str, mv):
         globalname, localname = mk.split('/')
         subname = '{}/{}'.format(globalname, localname.replace('ACC', ''))
-        TP = sum(self.metrics[tag][f'{subname}TP:reduction_ignore'])
-        TN = sum(self.metrics[tag][f'{subname}TN:reduction_ignore'])
-        FP = sum(self.metrics[tag][f'{subname}FP:reduction_ignore'])
-        FN = sum(self.metrics[tag][f'{subname}FN:reduction_ignore'])
+        TP = sum(self.memory[tag][f'{subname}TP:reduction_ignore'])
+        TN = sum(self.memory[tag][f'{subname}TN:reduction_ignore'])
+        FP = sum(self.memory[tag][f'{subname}FP:reduction_ignore'])
+        FN = sum(self.memory[tag][f'{subname}FN:reduction_ignore'])
         return (TP + TN) / (TP + TN + FP + FN)
 
 

@@ -1,3 +1,4 @@
+import torch
 import numpy as np
 from KERNEL.SCRIPT.python.classes.basic import PYBASE
 
@@ -9,6 +10,18 @@ class Mathematics(PYBASE):
     def __start(self):
         pass
 
+    def tanh(self, x):
+        x = torch.tensor(x)
+        return x.tanh().numpy()
+
+    def tanh_sx(self, x_np):
+        x_np = torch.tensor(x_np)
+        x_np2 = 2 * x_np.abs()
+        return torch.min(torch.max((-x_np2+1), ((x_np2/5) - (1/5))), x_np**0).numpy()
+    
+    def tanh_gsl(self, g, x_np):
+        return g * (1 + self.tanh_sx(x_np) / 2)
+    
     def triangle(self, A, B, C):
         """
             A, B, C are nodes in triangle

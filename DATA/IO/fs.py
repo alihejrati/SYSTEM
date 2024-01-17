@@ -5,6 +5,8 @@ from glob import glob
 from os.path import \
     join as ospjoin, \
     isdir as ospisdir, \
+    isfile as ospisfile, \
+    exists as ospexists, \
     split as ospsplit, \
     dirname as ospdirname,\
     abspath as ospabspath
@@ -31,7 +33,7 @@ def path(*fpath, **kwargs):
     
     if fpath.startswith('*'): # NOTE: index path
         fpath = ospjoin(__STRUCTURE['@IO'], 'import', fpath[1:])
-    elif fpath.startswith('@'): # NOTE: index path
+    elif fpath.startswith('@'): # NOTE: index path (Recomended)
         fpath_split = fpath.split(os.sep)
         fpath_split[0] = __STRUCTURE[fpath_split[0].upper()]
         fpath = os.sep.join(fpath_split)
@@ -51,6 +53,15 @@ def path(*fpath, **kwargs):
     if kwargs.get('makedirs', False): # OPTIONAL
         os.makedirs(ospsplit(fpath)[0], exist_ok=True)
 
+    if kwargs.get('isfile', False):
+        return ospisfile(fpath)
+    
+    if kwargs.get('isdir', False):
+        return ospisdir(fpath)
+    
+    if kwargs.get('exist', False):
+        return ospexists(fpath)
+    
     # if kwargs.get('mark', False): # OPTIONAL
     #     mark_file = str(kwargs.get('mark_file', __MARK_FILE)) # OPTIONAL
     #     pass

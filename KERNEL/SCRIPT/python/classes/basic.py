@@ -3,6 +3,7 @@
 # starting with an uppercase letter. It is also recommended to avoid using 
 # single-character names unless they are for temporary or looping variables.
 
+from DATA.IO.fs import path as fspath
 from types import MethodType, FunctionType
 
 class PYBASE:
@@ -26,7 +27,7 @@ class PYBASE:
         self.__start()
 
     def __start(self):
-        pass
+        self.fspath = fspath
     
     # def def_ifn(self, name: str, fn, **kwargs):
     #     """

@@ -9,9 +9,13 @@ class Grad(PYBASE):
 
     def __start(self):
         pass
-
+    
+    def sethook(tensor, callback):
+        tensor.register_hook(lambda grad: callback(grad))
+    
     def dzq_dz_eq1(self, zq, z, w=1):
         """
+            # NOTE: if zq has gradient and z hasnt requires_grad then gradient of zq is fucked:)
             transfer gradients from `zq` to `z`  | (zq -> z)
             `zq` and `z` must be the same shape
             (Notic): zq not change in terms of numerically but here we define a drevative path from zq to z such that (dzq/dz = 1)
