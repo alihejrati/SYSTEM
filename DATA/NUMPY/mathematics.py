@@ -15,12 +15,24 @@ class Mathematics(PYBASE):
         return x.tanh().numpy()
 
     def tanh_sx(self, x_np):
-        x_np = torch.tensor(x_np)
+        """Tanh satisfaction loss function"""
         x_np2 = 2 * x_np.abs()
-        return torch.min(torch.max((-x_np2+1), ((x_np2/5) - (1/5))), x_np**0).numpy()
+        return torch.min(torch.max((-x_np2+1), ((x_np2/5) - (1/5))), x_np**0)
     
     def tanh_gsl(self, g, x_np):
-        return g * (1 + self.tanh_sx(x_np) / 2)
+        """gradient scaler loss function by Tanh properties"""
+        g = torch.tensor(g)
+        x_np = torch.tensor(x_np)
+        g_sign = g.sign().clone().detach()
+        
+        μ, β = g.frexp()
+        γ = β - 1
+        γ_new = γ / (γ.abs().max() + 1) # γ_new is in (-1, 1)
+        g_new = 10 * torch.ldexp(μ, 1+γ_new)
+
+        out = (g_new.abs() * (1 + 0.5 * self.tanh_sx(x_np))) * g_sign
+        return out.numpy()
+    
     
     def triangle(self, A, B, C):
         """
