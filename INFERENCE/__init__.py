@@ -56,6 +56,7 @@ class Metrics(Memory):
         for rk, rv in R.items():
             if pattern.match(rk):
                 RV.append(rv)
+        assert len(RV) > 0, f'`regexp={regexp}` Not Found in: `{list(R.keys())}`'
         return getattr(self, reduction)(tag, None, RV)
 
     def reduction_sum(self, tag: str, mk: str, mv):
@@ -70,11 +71,20 @@ class Metrics(Memory):
     def reduction_accuracy(self, tag: str, mk: str, mv):
         globalname, localname = mk.split('/')
         subname = '{}/{}'.format(globalname, localname.replace('ACC', ''))
-        TP = sum(self.memory[tag][f'{subname}TP:reduction_ignore'])
-        TN = sum(self.memory[tag][f'{subname}TN:reduction_ignore'])
-        FP = sum(self.memory[tag][f'{subname}FP:reduction_ignore'])
-        FN = sum(self.memory[tag][f'{subname}FN:reduction_ignore'])
-        return (TP + TN) / (TP + TN + FP + FN)
+        
+        TP = sum(self.metrics[tag][f'{subname}TP:reduction_ignore'])
+        TN = sum(self.metrics[tag][f'{subname}TN:reduction_ignore'])
+        FP = sum(self.metrics[tag][f'{subname}FP:reduction_ignore'])
+        FN = sum(self.metrics[tag][f'{subname}FN:reduction_ignore'])
+        
+        ACC = 0
+        A = TP + TN
+        B = TP + TN + FP + FN
+        
+        if B > 0:
+            ACC = A / B
+        
+        return ACC
 
 
 class SQLiteLogger(Metrics):
