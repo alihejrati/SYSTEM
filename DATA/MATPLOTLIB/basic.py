@@ -76,7 +76,7 @@ class Plot(PYBASE):
             
             xlist = []
             for xk in x:
-                if isinstance(xk, str):
+                if isinstance(xk, str) and ':' in x[xk]:
                     xkmin, xkres, xkmax = x[xk].split(':')
                     x[xk] = self.sampler(xkmin, xkmax, xkres)
                 xlist.append(x[xk])
@@ -159,6 +159,37 @@ if __name__ == '__main__':
     #         (['s'], dict(color='red', label='‌$\dot{\Theta}_f$ ~ uniform density')),
     #         (['o'], dict(color='red', label='$\dot{\Theta}_f$ ~ sharp density')),
     #         (['o'], dict(color='green', label='$\dot{\Theta}_f$ ~ smooth density')),
+    #     ]
+    # )
+    
+    
+    plot_tanh_sx = Plot(xlabel='grad | resolution=0.1', ylabel='λgs . GS(grad) | λgs=3', loc='upper left')
+    plot_tanh_sx.plot(
+        [
+            '-100:0.1:100',
+        ], 
+        [
+            'tanh_gsl0',
+        ],
+        [
+            (['-'], dict(label='λgs . GS(grad)')),
+        ]
+    )
+
+
+    # plot_tanh_sx = Plot(xlabel='grad | resolution=0.1', ylabel='λgs . GS(grad) | λgs=3', loc='upper left')
+    # plot_tanh_sx.plot(
+    #     [
+    #         '-100:0.1:100',
+    #         [0.0],
+    #     ], 
+    #     [
+    #         'tanh_gsl0',
+    #         'tanh_gsl0',
+    #     ],
+    #     [
+    #         (['.'], dict(label='λgs . GS(grad≢0)')),
+    #         (['.'], dict(label='λgs . GS(grad=0)')),
     #     ]
     # )
     

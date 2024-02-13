@@ -10,28 +10,44 @@ class Mathematics(PYBASE):
     def __start(self):
         pass
 
-    def tanh(self, x):
-        x = torch.tensor(x)
-        return x.tanh().numpy()
+    # def tanh(self, x):
+    #     x = torch.tensor(x)
+    #     return x.tanh().numpy()
 
-    def tanh_sx(self, x_np):
-        """Tanh satisfaction loss function"""
-        x_np2 = 2 * x_np.abs()
-        return torch.min(torch.max((-x_np2+1), ((x_np2/5) - (1/5))), x_np**0)
+    # def tanh_sx(self, x_np):
+    #     """Tanh satisfaction loss function"""
+    #     x_np2 = 2 * x_np.abs()
+    #     return torch.min(torch.max((-x_np2+1), ((x_np2/5) - (1/5))), x_np**0)
     
-    def tanh_gsl(self, g, x_np):
+    def tanh_gsl0(self, g):
+        λgs = 3
+        return λgs * self.GS(g)
+    
+    def GS(self, g):
         """gradient scaler loss function by Tanh properties"""
         g = torch.tensor(g)
-        x_np = torch.tensor(x_np)
-        g_sign = g.sign().clone().detach()
-        
-        μ, β = g.frexp()
-        γ = β - 1
-        γ_new = γ / (γ.abs().max() + 1) # γ_new is in (-1, 1)
-        g_new = 10 * torch.ldexp(μ, 1+γ_new)
+        L = 0
+        m, e = g.frexp()
+        ga = e - 1
 
-        out = (g_new.abs() * (1 + 0.5 * self.tanh_sx(x_np))) * g_sign
+        ga_new = 1 + (ga / (1 + ga.abs().max())) # γ_new is in (-1, 1)
+        g_new = torch.ldexp(torch.sign(m), ga_new)
+        out = g_new
         return out.numpy()
+    
+    # def tanh_gsl(self, g, x_np):
+    #     """gradient scaler loss function by Tanh properties"""
+    #     g = torch.tensor(g)
+    #     x_np = torch.tensor(x_np)
+    #     g_sign = g.sign().clone().detach()
+        
+    #     μ, β = g.frexp()
+    #     γ = β - 1
+    #     γ_new = γ / (γ.abs().max() + 1) # γ_new is in (-1, 1)
+    #     g_new = 10 * torch.ldexp(μ, 1+γ_new)
+
+    #     out = (g_new.abs() * (1 + 0.5 * self.tanh_sx(x_np))) * g_sign
+    #     return out.numpy()
     
     
     def triangle(self, A, B, C):
